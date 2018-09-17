@@ -23,8 +23,7 @@ namespace ACCEA.EmailSpooler
             bool sendStatus = false;
             try
             {
-                int i=10, j=0, k;
-                k = i / j;
+               
                 string from = Program.appConfig[Constants.SenderAddress];
                 string userName = Program.appConfig[Constants.UserName];
                 string password = Program.appConfig[Constants.Password];
