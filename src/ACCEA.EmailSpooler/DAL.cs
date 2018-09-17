@@ -20,6 +20,7 @@ namespace ACCEA.EmailSpooler
 
         public DataTable GetEmailNotifications()
         {
+            DataTable dataTable = null;
             try
             {
                 OracleConnection connection = GetDatabaseConnection();
@@ -34,19 +35,21 @@ namespace ACCEA.EmailSpooler
                     command.Parameters.Add("T_CURSOR", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
 
                     adapter.SelectCommand = command;
-                    DataTable dataTable = new DataTable();
+                    dataTable = new DataTable();
                     adapter.Fill(dataTable);
-                    return dataTable;
+
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "Error in GetEmailNotifications() " + ex.Message.ToString());
             }
+            return dataTable;
         }
 
         public DataTable GetEmailNotificationsWithAttachment()
         {
+            DataTable dataTable = null;
             try
             {
                 OracleConnection connection = GetDatabaseConnection();
@@ -60,15 +63,16 @@ namespace ACCEA.EmailSpooler
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.Add("T_CURSOR", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
                     adapter.SelectCommand = command;
-                    DataTable dataTable = new DataTable();
+                    dataTable = new DataTable();
                     adapter.Fill(dataTable);
-                    return dataTable;
+
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "Error in GetEmailNotificationsWithAttachment() " + ex.Message.ToString());
             }
+            return dataTable;
         }
 
         public void UpdateMailAttemptsAndStatus(int notificationId, bool mailStatus, int maxAtempts)
@@ -101,9 +105,9 @@ namespace ACCEA.EmailSpooler
                     int returnValue = command.ExecuteNonQuery();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "Error in UpdateMailAttemptsAndStatus() " + ex.Message.ToString());
             }
         }
 
@@ -133,25 +137,24 @@ namespace ACCEA.EmailSpooler
                     int returnValue = command.ExecuteNonQuery();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "Error in UpdateEmailErrorLogs() " + ex.Message.ToString());
             }
         }
 
         private OracleConnection GetDatabaseConnection()
         {
+            OracleConnection connection = null;
             try
             {
-                OracleConnection connection = new OracleConnection(connectionString);
-                return connection;
+                connection = new OracleConnection(connectionString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "Error in GetDatabaseConnection() " + ex.Message.ToString());
             }
-
+            return connection;
         }
 
     }
