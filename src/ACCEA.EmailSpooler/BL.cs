@@ -39,12 +39,13 @@ namespace ACCEA.EmailSpooler
                         email.Subject = Convert.ToString(notification["MailSubject"]);
                         email.Body = Convert.ToString(notification["MailBody"]);
                         bool result=sendMail.TriggerEmail(email);
-                        dbContext.UpdateMailAttemptsAndStatus(Convert.ToInt32(notification["NOTIFICATIONID"]),result);
+                        dbContext.UpdateMailAttemptsAndStatus(Convert.ToInt32(notification["NOTIFICATIONID"]),result,5);
 
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        throw;
+                        dbContext.UpdateEmailErrorLogs(Convert.ToInt32(notification["NOTIFICATIONID"]), ex.Message.ToString());
+
                     }
                 }
             }
@@ -66,11 +67,12 @@ namespace ACCEA.EmailSpooler
                         email.AttachmentName = Convert.ToString(notification["COMMFILENAME"]);
                         email.AttachmentData = (byte[])(notification["Communicationfile"]);
                         bool result = sendMail.TriggerEmail(email);
-                        dbContext.UpdateMailAttemptsAndStatus(Convert.ToInt32(notification["NOTIFICATIONID"]), result);
+                        dbContext.UpdateMailAttemptsAndStatus(Convert.ToInt32(notification["NOTIFICATIONID"]), result,5);
                     }
                     catch(Exception ex)
                     {
-                        throw;
+                        dbContext.UpdateEmailErrorLogs(Convert.ToInt32(notification["NOTIFICATIONID"]), ex.Message.ToString());
+
                     }
 
                 }

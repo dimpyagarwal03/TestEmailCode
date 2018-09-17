@@ -57,7 +57,7 @@ namespace ACCEA.EmailSpooler
             }
         }
 
-        public void UpdateMailAttemptsAndStatus(int notificationId,bool mailStatus)
+        public void UpdateMailAttemptsAndStatus(int notificationId,bool mailStatus,int maxAtempts)
         {
             OracleConnection connection = GetDatabaseConnection();
             using (connection)
@@ -69,7 +69,7 @@ namespace ACCEA.EmailSpooler
                 command.CommandText = "ACE_EMAIL_SPOOLER_PKG.UpdateEmailStatus";
                 command.CommandType = CommandType.StoredProcedure;
 
-                OracleParameter objcmdParameter = new OracleParameter("notificationId", notificationId);
+                OracleParameter objcmdParameter = new OracleParameter("p_notificationId", notificationId);
                 objcmdParameter.DbType = DbType.Int32;
                 objcmdParameter.Direction = ParameterDirection.Input;
                 command.Parameters.Add(objcmdParameter);
@@ -77,8 +77,39 @@ namespace ACCEA.EmailSpooler
                 objcmdParameter.DbType = DbType.Int32;
                 objcmdParameter.Direction = ParameterDirection.Input;
                 command.Parameters.Add(objcmdParameter);
+                objcmdParameter = new OracleParameter("maxAttempts", maxAtempts);
+                objcmdParameter.DbType = DbType.Int32;
+                objcmdParameter.Direction = ParameterDirection.Input;
+                command.Parameters.Add(objcmdParameter);
+                connection.Open();
                 int returnValue=command.ExecuteNonQuery();
                 
+            }
+        }
+
+        public void UpdateEmailErrorLogs(int notificationId, string emailerror)
+        {
+            OracleConnection connection = GetDatabaseConnection();
+            using (connection)
+            {
+                OracleDataAdapter adapter = new OracleDataAdapter();
+                OracleCommand command = new OracleCommand();
+                command.Connection = connection;
+                command.InitialLONGFetchSize = 1000;
+                command.CommandText = "ACE_EMAIL_SPOOLER_PKG.LogEmailErrors";
+                command.CommandType = CommandType.StoredProcedure;
+
+                OracleParameter objcmdParameter = new OracleParameter("p_notificationId", notificationId);
+                objcmdParameter.DbType = DbType.Int32;
+                objcmdParameter.Direction = ParameterDirection.Input;
+                command.Parameters.Add(objcmdParameter);
+                objcmdParameter = new OracleParameter("strErrMessage", emailerror);
+                objcmdParameter.DbType = DbType.Int32;
+                objcmdParameter.Direction = ParameterDirection.Input;
+                command.Parameters.Add(objcmdParameter);
+                connection.Open();
+                int returnValue = command.ExecuteNonQuery();
+
             }
         }
 
