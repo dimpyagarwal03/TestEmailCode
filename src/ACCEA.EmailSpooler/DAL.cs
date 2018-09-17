@@ -104,7 +104,7 @@ namespace ACCEA.EmailSpooler
                 objcmdParameter.Direction = ParameterDirection.Input;
                 command.Parameters.Add(objcmdParameter);
                 objcmdParameter = new OracleParameter("strErrMessage", emailerror);
-                objcmdParameter.DbType = DbType.Int32;
+                objcmdParameter.DbType = DbType.String;
                 objcmdParameter.Direction = ParameterDirection.Input;
                 command.Parameters.Add(objcmdParameter);
                 connection.Open();

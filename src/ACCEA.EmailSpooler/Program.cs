@@ -14,12 +14,13 @@ namespace ACCEA.EmailSpooler
         static void Main(string[] args)
         {
             LoggingUtility.WriteLog(ELogLevel.INFO, "Application Start");
+            Console.WriteLine("Application Start");
             GetAppSettings();
             BL bl = new BL();
-            //bl.ProcessEmailNotifications();
-            bl.ProcessEmailNotificationsWithAttachments();
-            Console.ReadKey();
+            bl.ProcessEmails();                        
+
             LoggingUtility.WriteLog(ELogLevel.INFO, "Application Complete");
+            Console.WriteLine("Application Start");
         }
 
         public static NameValueCollection appConfig;
