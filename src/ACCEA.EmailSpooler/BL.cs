@@ -44,15 +44,18 @@ namespace ACCEA.EmailSpooler
                         notificationId = Convert.ToInt32(notification["NOTIFICATIONID"]);
                         email = new Email();
                         email.To = Convert.ToString(notification["MailTo"]);
-                        email.Bcc = Program.appConfig[Constants.ACCEASecretariat].ToString();
+                        if (!string.IsNullOrEmpty(Convert.ToString(notification["EmailTEMPLATEID"])) && !string.IsNullOrEmpty(Convert.ToString(notification["EVENTDATE"])))
+                        {
+                            email.Bcc = Program.appConfig[Constants.ACCEASecretariat].ToString();
+                        }
                         email.Subject = Convert.ToString(notification["MailSubject"]);
                         email.Body = Convert.ToString(notification["MailBody"]);
-                        bool result=sendMail.TriggerEmail(email);
-                        dbContext.UpdateMailAttemptsAndStatus(notificationId, result,5);
+                        bool result = sendMail.TriggerEmail(email);
+                        dbContext.UpdateMailAttemptsAndStatus(notificationId, result, Convert.ToInt32(Program.appConfig[Constants.MaxRetryAttempts]));
                     }
                     catch (Exception ex)
                     {
-                        LoggingUtility.WriteLog(ELogLevel.ERROR, "ProcessEmailNotifications() | Error in sending emails : " + notificationId.ToString() + " "+ex.Message.ToString());
+                        LoggingUtility.WriteLog(ELogLevel.ERROR, "ProcessEmailNotifications() | Error in sending emails : " + notificationId.ToString() + " " + ex.Message.ToString());
                         dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString());
                     }
                 }
@@ -69,19 +72,24 @@ namespace ACCEA.EmailSpooler
             {
                 foreach (DataRow notification in emailNotificationsData.Rows)
                 {
-                    int notificationId=0;
-                    try {                       
-                        notificationId =Convert.ToInt32(notification["NOTIFICATIONID"]);
+                    int notificationId = 0;
+                    try
+                    {
+                        notificationId = Convert.ToInt32(notification["NOTIFICATIONID"]);
                         email = new Email();
                         email.To = Convert.ToString(notification["MailTo"]);
+                        if (!string.IsNullOrEmpty(Convert.ToString(notification["EmailTEMPLATEID"])) && !string.IsNullOrEmpty(Convert.ToString(notification["EVENTDATE"])))
+                        {
+                            email.Bcc = Program.appConfig[Constants.ACCEASecretariat].ToString();
+                        }
                         email.Subject = Convert.ToString(notification["MailSubject"]);
                         email.Body = Convert.ToString(notification["MailBody"]);
                         email.AttachmentName = Convert.ToString(notification["COMMFILENAME"]);
                         email.AttachmentData = (byte[])(notification["Communicationfile"]);
                         bool result = sendMail.TriggerEmail(email);
-                        dbContext.UpdateMailAttemptsAndStatus(notificationId, result,5);
+                        dbContext.UpdateMailAttemptsAndStatus(notificationId, result,Convert.ToInt32(Program.appConfig[Constants.MaxRetryAttempts]));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         LoggingUtility.WriteLog(ELogLevel.ERROR, "ProcessEmailNotificationsWithAttachments() | Error in sending emails : " + notificationId.ToString() + " " + ex.Message.ToString());
                         dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString());

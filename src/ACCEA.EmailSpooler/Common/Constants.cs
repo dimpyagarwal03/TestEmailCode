@@ -15,7 +15,6 @@ namespace ACCEA.EmailSpooler.Common
         public const string SubjectPrefix = "SubjectPrefix";
         public const string SenderAddress = "SenderAddress";
         public const string ACCEASecretariat = "ACCEASecretariat";
-
-        
+        public const string MaxRetryAttempts = "MaxRetryAttempts";
     }
 }
