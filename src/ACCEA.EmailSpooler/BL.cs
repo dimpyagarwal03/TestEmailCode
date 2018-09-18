@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 
 namespace ACCEA.EmailSpooler
@@ -23,13 +25,29 @@ namespace ACCEA.EmailSpooler
         public void ProcessEmails()
         {
             LoggingUtility.WriteLog(ELogLevel.INFO, "Emails processing started");
-            ProcessEmailNotifications();
 
-            ProcessEmailNotificationsWithAttachments();
+            bool IsConnectionSuccess=TestConnection();
+            ProcessEmailNotifications(IsConnectionSuccess);
+            ProcessEmailNotificationsWithAttachments(IsConnectionSuccess);
             LoggingUtility.WriteLog(ELogLevel.INFO, "Emails processing completed");
         }
 
-        public void ProcessEmailNotifications()
+        private bool TestConnection()
+        {
+            bool result = false;
+            try {
+                SendMail mailObject = new SendMail();
+                result= mailObject.TestSMTPConnection();
+            }
+            catch(Exception ex)
+            {
+                dbContext.UpdateEmailErrorLogs(0, ex.Message.ToString(), result);
+
+            }
+            return result;
+        }
+
+        public void ProcessEmailNotifications(bool IsConnectionSuccess)
         {
             LoggingUtility.WriteLog(ELogLevel.INFO, "Processing non attachment emails started");
             Email email;
@@ -56,14 +74,14 @@ namespace ACCEA.EmailSpooler
                     catch (Exception ex)
                     {
                         LoggingUtility.WriteLog(ELogLevel.ERROR, "ProcessEmailNotifications() | Error in sending emails : " + notificationId.ToString() + " " + ex.Message.ToString());
-                        dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString());
+                        dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString(), IsConnectionSuccess);
                     }
                 }
             }
             else LoggingUtility.WriteLog(ELogLevel.INFO, "No pending emails for process");
         }
 
-        public void ProcessEmailNotificationsWithAttachments()
+        public void ProcessEmailNotificationsWithAttachments(bool IsConnectionSuccess)
         {
             LoggingUtility.WriteLog(ELogLevel.INFO, "Processing attachment emails started");
             Email email;
@@ -92,7 +110,7 @@ namespace ACCEA.EmailSpooler
                     catch (Exception ex)
                     {
                         LoggingUtility.WriteLog(ELogLevel.ERROR, "ProcessEmailNotificationsWithAttachments() | Error in sending emails : " + notificationId.ToString() + " " + ex.Message.ToString());
-                        dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString());
+                        dbContext.UpdateEmailErrorLogs(notificationId, ex.Message.ToString(), IsConnectionSuccess);
                     }
                 }
             }

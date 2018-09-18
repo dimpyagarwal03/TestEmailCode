@@ -82,7 +82,6 @@ namespace ACCEA.EmailSpooler
                 OracleConnection connection = GetDatabaseConnection();
                 using (connection)
                 {
-                    OracleDataAdapter adapter = new OracleDataAdapter();
                     OracleCommand command = new OracleCommand();
                     command.Connection = connection;
                     command.InitialLONGFetchSize = 1000;
@@ -111,14 +110,13 @@ namespace ACCEA.EmailSpooler
             }
         }
 
-        public void UpdateEmailErrorLogs(int notificationId, string emailerror)
+        public void UpdateEmailErrorLogs(int notificationId, string emailerror,bool IsConnectionSuccess)
         {
             try
             {
                 OracleConnection connection = GetDatabaseConnection();
                 using (connection)
                 {
-                    OracleDataAdapter adapter = new OracleDataAdapter();
                     OracleCommand command = new OracleCommand();
                     command.Connection = connection;
                     command.InitialLONGFetchSize = 1000;
@@ -131,6 +129,10 @@ namespace ACCEA.EmailSpooler
                     command.Parameters.Add(objcmdParameter);
                     objcmdParameter = new OracleParameter("strErrMessage", emailerror);
                     objcmdParameter.DbType = DbType.String;
+                    objcmdParameter.Direction = ParameterDirection.Input;
+                    command.Parameters.Add(objcmdParameter);
+                    objcmdParameter = new OracleParameter("IsConnectionSuccess", Convert.ToInt32(IsConnectionSuccess));
+                    objcmdParameter.DbType = DbType.Int32;
                     objcmdParameter.Direction = ParameterDirection.Input;
                     command.Parameters.Add(objcmdParameter);
                     connection.Open();

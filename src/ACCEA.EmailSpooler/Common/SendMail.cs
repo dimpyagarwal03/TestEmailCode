@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Mime;
 using ACCEA.EmailSpooler.Entities;
 using ACCEA.EmailSpooler.Common;
+using System.Net.Sockets;
 
 namespace ACCEA.EmailSpooler
 {
@@ -74,6 +75,36 @@ namespace ACCEA.EmailSpooler
                 throw ex;
             }
             return sendStatus;
+        }
+
+        public bool TestSMTPConnection()
+        {
+            bool hostAvailable = false;
+            try
+            {
+                TcpClient smtpTestClient = new TcpClient();
+                string smtpHost = Program.appConfig[Constants.SMTPHost];
+                int port = Convert.ToInt32(Program.appConfig[Constants.SMTPPort]);
+                smtpTestClient.Connect(smtpHost, port);
+                if (smtpTestClient.Connected)//connection is established
+                {
+                    NetworkStream netStream = smtpTestClient.GetStream();
+                    StreamReader sReader = new StreamReader(netStream);
+                    if (sReader.ReadLine().Contains("220"))//host is available for communication
+                    {
+                        hostAvailable = true;
+                    }
+                    smtpTestClient.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw;
+
+                //some action like writing to error log
+            }
+            return hostAvailable;
+
         }
     }
 }
