@@ -93,15 +93,17 @@ namespace ACCEA.EmailSpooler
                     if (sReader.ReadLine().Contains("220"))//host is available for communication
                     {
                         hostAvailable = true;
+                        LoggingUtility.WriteLog(ELogLevel.INFO, "SMTP Server Connection Successful. ");
                     }
                     smtpTestClient.Close();
                 }
             }
             catch(Exception ex)
             {
-                throw;
+                LoggingUtility.WriteLog(ELogLevel.ERROR, "SMTP Server Connection Error. " + ex.Message);
+                Console.WriteLine("SMTP Server Connection Error: " + ex.Message);
+                throw ex;
 
-                //some action like writing to error log
             }
             return hostAvailable;
 

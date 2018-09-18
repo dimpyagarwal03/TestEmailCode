@@ -24,9 +24,8 @@ namespace ACCEA.EmailSpooler
 
         public void ProcessEmails()
         {
-            LoggingUtility.WriteLog(ELogLevel.INFO, "Emails processing started");
-
             bool IsConnectionSuccess=TestConnection();
+            LoggingUtility.WriteLog(ELogLevel.INFO, "Emails processing started");
             ProcessEmailNotifications(IsConnectionSuccess);
             ProcessEmailNotificationsWithAttachments(IsConnectionSuccess);
             LoggingUtility.WriteLog(ELogLevel.INFO, "Emails processing completed");
